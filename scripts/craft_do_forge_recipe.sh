@@ -2,11 +2,11 @@
 
 # Craft CMS Server Setup 
 #
-# Forge Bash Script Recipe for CraftCMS websites on Digital Ocean
+# Forge Bash Script Recipe for Craft CMS websites
 #
-# @author    webrgp
+# @author    webrgp & engram-design
 # @link      https://github.com/webrgp
-# @package   craft-do-forge-recipe
+# @package   craft-forge-recipe
 # @since     1.0.0
 # @license   MIT
 
@@ -20,31 +20,8 @@ info_msg () { echo -e "\e[34m*** $1\e[0m"; }
 print_msg () { echo -e ">> $1"; }
 
 
-# Install Digital Ocean Monitoring tools
-install_do_monitoring_tools () {
-  curl -sSL https://agent.digitalocean.com/install.sh | sh
-}
-
-
-# Fix MySql 5.7.5+ issue ( https://craftcms.stackexchange.com/questions/12084/getting-this-sql-error-group-by-incompatible-with-sql-mode-only-full-group-by/12106 )
-patch_mysql () {
-  info_msg "Start fix for MySql 5.7.5+ issue"
-
-  if grep -q -i '\[mysqld\]' /etc/mysql/my.cnf; then
-    success_msg "Server is already patch"
-  else
-    print_msg "Starting MySql patching"
-      cat <<EOT >> /etc/mysql/my.cnf
-[mysqld]
-sql_mode=STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
-EOT
-    success_msg "MySql patch is complete!"
-  fi
-}
-
-
 # Install jpegoptim & optipng ( https://nystudio107.com/blog/creating-optimized-images-in-craft-cms )
-install_imager_req () {
+install_image_tools () {
   type jpegoptim >/dev/null 2>&1 || { print_msg "Installing jpegoptim"; apt-get -y install jpegoptim; }
   type optipng >/dev/null 2>&1 || { print_msg "Installing optipng"; apt-get -y install optipng; }
   success_msg "jpegoptim & optipng installed!"
@@ -62,7 +39,6 @@ install_nginx_partials () {
   fi
 
   success_msg "nginx-partials installed!"
-
 }
 
 
@@ -80,14 +56,12 @@ We are unable to find either "sudo" or "su" available to make this happen.'
   success_msg "Woot! User is root :-)"
 
   # Install Steps
-  patch_mysql
-  install_imager_req
+  install_image_tools
   install_nginx_partials
-  install_do_monitoring_tools
 
-  success_msg "CraftCMS setup on Forge completed!"
+  success_msg "Craft CMS setup on Forge completed!"
 }
 
-info_msg "Start CraftCMS setup on Forge"
+info_msg "Start Craft CMS setup on Forge"
 
 perform_craftcms_server_setup
